@@ -2,7 +2,7 @@ function extractSubsequence(sequence) {
     let biggestElement = 0;
 
     console.log(sequence.filter(element => {
-        const isBigger = element > biggestElement;
+        const isBigger = element >= biggestElement;
 
         if (isBigger) {
             biggestElement = element;
