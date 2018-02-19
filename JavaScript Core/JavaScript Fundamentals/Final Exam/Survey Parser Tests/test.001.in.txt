@@ -1,0 +1,10 @@
+﻿<p>Some random text</p>
+<svg>
+<cat><text>Stuff? [Stuff]</text></cat>
+<cat>
+<g><val>1</val>5</g>
+<g><val>2</val>7</g>
+<g><val>3</val>9</g>
+</cat>
+</svg>
+<p>Some more random text</p>

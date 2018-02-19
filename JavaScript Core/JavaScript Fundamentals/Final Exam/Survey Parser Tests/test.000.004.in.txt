@@ -1,0 +1,9 @@
+﻿<svg>
+<cat><text>Which is your favourite meal from our selection?</text></cat>
+<cat>
+<g><val>Fish</val>15</g>
+<g><val>Prawns</val>31</g>
+<g><val>Crab Langoon</val>12</g>
+<g><val>Calamari</val>17</g>
+</cat>
+</svg>

@@ -1,0 +1,13 @@
+﻿<svg>
+<cat><text>XXX [Label]</text></cat>
+<cat>
+<val>4</val>
+<val>5<val>
+<g>6</g>
+<g>7<g>
+<g><val>11<val></g>
+<g><val>20</val>5<g>
+<g><val>30</val></g>
+<g><val>9</val>10</g>
+</cat>
+</svg>

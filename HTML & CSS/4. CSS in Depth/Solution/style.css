@@ -1,0 +1,60 @@
+@import url("https://fonts.googleapis.com/css?family=Lato");
+
+body {
+    background: #333333;
+    color: #FFFFFF;
+    font-family: "Lato", sans-serif;
+    font-size: 16px;
+}
+
+main {
+    background: url("food-image-bg.png");
+    background-size: cover;
+    border-radius: 10px;
+    height: 875px;
+    width: 1500px;
+    margin: 0 auto;
+}
+
+main > h1 {
+    float: right;
+    text-transform: uppercase;
+    text-align: left;
+    margin-right: 200px;
+}
+
+div.recipes-info {
+}
+
+div.recipes-info > p {
+    display: inline-block;
+}
+
+div.recipes-info > p > span {
+    color: #B5C640;
+    font-weight: bold;
+}
+
+button.btn-primary {
+    border: 2px solid white;
+    border-radius: 20px;
+    background-color: transparent;
+    color: #FFFFFF;
+    cursor: pointer;
+    padding: 10px 15px;
+}
+
+button.btn-primary:hover {
+    background-color: #B5C640;
+    border-color: #B5C640;
+}
+
+ul.prep-steps {
+    list-style: none;
+    float: right;
+    padding: 0;
+}
+
+ul.prep-steps > li.step {
+
+}

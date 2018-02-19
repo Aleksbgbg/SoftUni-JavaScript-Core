@@ -1,0 +1,12 @@
+﻿<p>
+<svg>
+<cat><text>How do you rate SoftUni?[Trainers-General]</text></cat>
+<cat>
+<g><val>6</val>6</g>
+<g><val>6</val>6</g>
+<g><val>6</val>6</g>
+<g><val>6</val>6</g>
+<g><val>6</val>6</g>
+</cat>
+</svg>
+</p>

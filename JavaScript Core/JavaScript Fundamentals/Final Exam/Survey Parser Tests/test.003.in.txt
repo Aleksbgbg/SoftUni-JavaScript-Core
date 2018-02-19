@@ -1,0 +1,12 @@
+﻿<svg>
+<cat><text>[No label]</text></cat>
+<cat>
+<g><val>10</val>5000</g>
+<g><val>10</val>5000</g>
+<g><val>10</val>5000</g>
+<g><val>10</val>5000</g>
+<g><val>10</val>5000</g>
+<g><val>10</val>5000</g>
+<g><val>10</val>5000</g>
+</cat>
+</svg>
