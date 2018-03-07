@@ -1,0 +1,27 @@
+const sharedObject = require("./shared-boject.js").sharedObject;
+
+const expect = require("chai").expect;
+
+beforeEach(function() {
+    $("html").html(`<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <title>ArmageDOM</title>
+</head>
+<body>
+<div id="target">
+ <div class="nested target">
+ <p>This is some text</p>
+ </div>
+ <div class="target">
+ <p>Empty div</p>
+ </div>
+ <div class="inside">
+ <span class="nested">Some more text</span>
+ <span class="target">Some more text</span>
+ </div>
+</div>
+</body>
+</html>`);
+});
