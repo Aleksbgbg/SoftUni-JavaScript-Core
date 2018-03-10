@@ -2,7 +2,7 @@ function elemelons() {
     class Melon {
         constructor(weight, melonSort) {
             if (new.target === Melon) {
-                throw new TypeError("Abstract class 'Melon' cannot be directly instantiated.");
+                throw new TypeError("Abstract class cannot be instantiated directly");
             }
 
             this.weight = weight;
@@ -13,8 +13,13 @@ function elemelons() {
             return this.weight * this.melonSort.length;
         }
 
+        get element() {
+            const string = this.constructor.name.slice(0, this.constructor.name.length - 5);
+            return string;
+        }
+
         toString() {
-            return `Element: ${this.constructor.name.slice(0, this.constructor.name.length - 5)}
+            return `Element: ${this.element}
 Sort: ${this.melonSort}
 Element Index: ${this.elementIndex}`;
         }
@@ -33,19 +38,23 @@ Element Index: ${this.elementIndex}`;
     }
 
     class Melolemonmelon extends Firemelon {
-        constructor() {
-            super(0, "Melonmelon");
+        constructor(weight, melonSort) {
+            super(weight, melonSort);
 
             this.morphIndex = -1;
             this.morph();
         }
 
         get nextMorphInstance() {
-            return new [Watermelon, Firemelon, Earthmelon, Airmelon][++this.morphIndex % 4]();
+            return ["Water", "Fire", "Earth", "Air"][++this.morphIndex % 4];
+        }
+
+        get element() {
+            return this._element;
         }
 
         morph() {
-            this.element = this.nextMorphInstance;
+            this._element = this.nextMorphInstance;
         }
     }
 
@@ -80,8 +89,9 @@ console.log(watermelon.toString());
 // Sort: Kingsize
 // Element Index: 100
 
-const morpher = new Melolemonmelon();
+const morpher = new Melolemonmelon(12.5, "Ghost");
 for (let iteration = 0; iteration < 10; iteration++) {
     morpher.morph();
+
     console.log(morpher.toString());
 }
