@@ -1,2 +1,2 @@
-# SoftUni JavaScript Exercises
-A myriad of exercises for the SoftUni JavaScript course.
+# SoftUni JavaScript Modules
+A myriad of lectures and exercises from several Software University JavaScript modules.
