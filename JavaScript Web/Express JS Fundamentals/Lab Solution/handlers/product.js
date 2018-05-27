@@ -1,7 +1,9 @@
 const database = require("../config/database");
 const fs = require("fs");
+const multiparty = require("multiparty");
 const path = require("path");
 const querystring = require("querystring");
+const shortid = require("shortid");
 const url = require("url");
 
 module.exports = function(request, response) {
@@ -32,13 +34,41 @@ module.exports = function(request, response) {
 
         return true;
     } else if (request.pathname === "/product/add" && request.method === "POST") {
-        let dataStream = "";
+        const form = new multiparty.Form();
 
-        request.on("data", data => dataStream += data);
+        const product = { };
 
-        request.on("end", function() {
-            const product = querystring.parse(dataStream);
+        form.on("part", function(part) {
+            if (part.filename) {
+                part.setEncoding("binary");
 
+                let dataStream = "";
+
+                part.on("data", data => dataStream += data);
+                part.on("end", function() {
+                    const filepath = `../content/images/${shortid.generate()}.png`;
+
+                    product.image = filepath;
+
+                    fs.writeFile(path.normalize(path.join(__dirname, filepath)), dataStream, {
+                        encoding: "ascii"
+                    }, function(error) {
+                        if (error) {
+                            console.log(error);
+                        }
+                    });
+                });
+            } else {
+                part.setEncoding("utf-8");
+
+                let dataStream = "";
+
+                part.on("data", data => dataStream += data);
+                part.on("end", () => product[part.name] = dataStream);
+            }
+        });
+
+        form.on("close", function() {
             database.products.add(product);
 
             response.writeHead(302, {
@@ -46,6 +76,10 @@ module.exports = function(request, response) {
             });
             response.end();
         });
+
+        form.parse(request);
+
+        return true;
     }
 
     return false;

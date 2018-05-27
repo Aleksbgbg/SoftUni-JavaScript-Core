@@ -6,7 +6,8 @@ module.exports = function(request, response) {
     function getContentType(url) {
         const mimeTypes = {
             ".css": "text/css",
-            ".ico": "image/x-icon"
+            ".ico": "image/x-icon",
+            ".png": "image/png"
         };
 
         return mimeTypes[path.extname(url)];

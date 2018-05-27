@@ -1,20 +1,27 @@
-const products = [];
+const fs = require("fs");
+const path = require("path");
+
+const databasePath = path.join(__dirname, "database.json");
 
 module.exports = {
     products: {
-        getAll: () => products,
-        add: function(product) {
-            product.id = products.length;
-            products.push(product);
-        },
-        findByName: function(name) {
-            const matchedProducts = products.filter(product => product.name === name);
-
-            if (matchedProducts.length === 1) {
-                return matchedProducts[1];
+        getAll() {
+            if (!fs.existsSync(databasePath)) {
+                fs.writeFileSync(databasePath, "[]");
             }
 
-            return matchedProducts;
+            return JSON.parse(fs.readFileSync(databasePath).toString());
+        },
+        add(product) {
+            const products = this.getAll();
+
+            product.id = products.length + 1;
+            products.push(product);
+
+            fs.writeFileSync(databasePath, JSON.stringify(products));
+        },
+        findByName(name) {
+            return products.filter(product => product.name.toLowerCase().includes(name));
         }
     }
 };
