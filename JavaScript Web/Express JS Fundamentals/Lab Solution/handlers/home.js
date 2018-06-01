@@ -1,6 +1,6 @@
-const database = require("../config/database");
 const fs = require("fs");
 const path = require("path");
+const productModel = require("../models/product");
 const querystring = require("querystring");
 const url = require("url");
 
@@ -31,23 +31,23 @@ module.exports = function(request, response) {
 
             const queryData = querystring.parse(url.parse(request.url).query);
 
-            let products = database.products.getAll();
+            productModel.find().then(function(products) {
+                if (queryData.query) {
+                    products = products.filter(product => product.name.localeCompare(queryData.query) === 0);
+                }
 
-            if (queryData.query) {
-                products = products.filter(product => product.name.localeCompare(queryData.query) === 0);
-            }
-
-            response.write(data.toString().replace("{content}",
-                products
-                    .map(product => `
+                response.write(data.toString().replace("{content}",
+                    products
+                        .map(product => `
                 <div class="product-card">
                     <img class="product-img" src="${product.image}"/>
                     <h2>${product.name}</h2>
                     <p>${product.description}</p>
                 </div>`)
-                    .join()));
+                        .join()));
 
-            response.end();
+                response.end();
+            });
         });
 
         return false;

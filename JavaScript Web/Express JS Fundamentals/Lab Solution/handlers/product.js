@@ -1,7 +1,8 @@
-const database = require("../config/database");
+const categoryModel = require("../models/category");
 const fs = require("fs");
 const multiparty = require("multiparty");
 const path = require("path");
+const productModel = require("../models/product");
 const querystring = require("querystring");
 const shortid = require("shortid");
 const url = require("url");
@@ -25,11 +26,20 @@ module.exports = function(request, response) {
                 return;
             }
 
-            response.writeHead(200, {
-                "content-type": "text/html"
+            categoryModel.find().then(function(categories) {
+               let replacement = "<select class='input-field' name='category'>";
+
+               for (const category of categories) {
+                   replacement += `<option value="${category._id}">${category.name}</option>`;
+               }
+               replacement += "</select>";
+
+               response.writeHead(200, {
+                   "content-type": "text/html"
+               });
+               response.write(data.toString().replace("{categories}", replacement));
+               response.end();
             });
-            response.write(data);
-            response.end();
         });
 
         return true;
@@ -69,12 +79,17 @@ module.exports = function(request, response) {
         });
 
         form.on("close", function() {
-            database.products.add(product);
+            productModel.create(product).then(function(newProduct) {
+                categoryModel.findById(product.category).then(function(category) {
+                    category.products.push(newProduct._id);
+                    category.save();
+                });
 
-            response.writeHead(302, {
-                location: "/"
+                response.writeHead(302, {
+                    location: "/"
+                });
+                response.end();
             });
-            response.end();
         });
 
         form.parse(request);
