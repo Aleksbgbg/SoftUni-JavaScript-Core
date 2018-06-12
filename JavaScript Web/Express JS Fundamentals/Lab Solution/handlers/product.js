@@ -1,101 +1,136 @@
-const categoryModel = require("../models/category");
 const fs = require("fs");
-const multiparty = require("multiparty");
 const path = require("path");
+
+const categoryModel = require("../models/category");
 const productModel = require("../models/product");
-const querystring = require("querystring");
-const shortid = require("shortid");
-const url = require("url");
 
-module.exports = function(request, response) {
-    if (!request.pathname) {
-        request.pathname = url.parse(request.url).pathname;
-    }
+module.exports.getAddProduct = function(request, response) {
+    categoryModel.find().then(function(categories) {
+        response.render("product/add", {
+            categories
+        });
+    });
+};
 
-    if (request.pathname === "/product/add" && request.method === "GET") {
-        const filepath = path.normalize(path.join(__dirname, "../views/products/add.html"));
+module.exports.postAddProduct = function(request, response) {
+    const product = request.body;
 
-        fs.readFile(filepath, function(error, data) {
-            if (error) {
-                response.writeHead(404, {
-                    "content-type": "text/plain"
-                });
-                response.write("Resource not found.");
-                response.end();
+    product.image = `\\${request.file.path}`;
 
-                return;
-            }
+    productModel.create(product).then(function(product) {
+        categoryModel.findById(product.category).then(function(category) {
+            category.products.push(product._id);
+            category.save();
+        });
 
-            categoryModel.find().then(function(categories) {
-               let replacement = "<select class='input-field' name='category'>";
+        response.redirect("/");
+    });
+};
 
-               for (const category of categories) {
-                   replacement += `<option value="${category._id}">${category.name}</option>`;
-               }
-               replacement += "</select>";
+module.exports.getEdit = function(request, response) {
+    productModel.findById(request.params.id).then(function(product) {
+        if (!product) {
+            response.sendStatus(404);
+            return;
+        }
 
-               response.writeHead(200, {
-                   "content-type": "text/html"
-               });
-               response.write(data.toString().replace("{categories}", replacement));
-               response.end();
+        categoryModel.find().then(function(categories) {
+            response.render("product/edit", {
+                product,
+                categories
             });
         });
+    });
+};
 
-        return true;
-    } else if (request.pathname === "/product/add" && request.method === "POST") {
-        const form = new multiparty.Form();
+module.exports.postEdit = function(request, response) {
+    productModel.findById(request.params.id).then(function(product) {
+        if (!product) {
+            response.redirect(`/?error=${encodeURIComponent("error=Product was not found!")}`);
+            return;
+        }
 
-        const product = { };
+        product.name = request.body.name;
+        product.description = request.body.description;
+        product.price = request.body.price;
 
-        form.on("part", function(part) {
-            if (part.filename) {
-                part.setEncoding("binary");
+        if (request.file) {
+            product.image = `\\${request.file.path}`;
+        }
 
-                let dataStream = "";
+        if (product.category.toString() !== request.body.category) {
+            categoryModel.findById(product.category).then(function(currentCategory) {
+                categoryModel.findById(request.body.category).then(function(nextCategory) {
+                    const index = currentCategory.products.indexOf(product._id);
 
-                part.on("data", data => dataStream += data);
-                part.on("end", function() {
-                    const filepath = `../content/images/${shortid.generate()}.png`;
+                    if (index !== -1) {
+                        currentCategory.products.splice(index, 1);
+                    }
 
-                    product.image = filepath;
+                    currentCategory.save();
 
-                    fs.writeFile(path.normalize(path.join(__dirname, filepath)), dataStream, {
-                        encoding: "ascii"
-                    }, function(error) {
-                        if (error) {
-                            console.log(error);
-                        }
-                    });
+                    nextCategory.products.push(product._id);
+                    nextCategory.save();
+
+                    product.category = request.body.category;
+
+                    product.save().then(() => response.redirect(`/?success=${encodeURIComponent("Product was edited successfully!")}`));
                 });
-            } else {
-                part.setEncoding("utf-8");
+            });
 
-                let dataStream = "";
+            return;
+        }
 
-                part.on("data", data => dataStream += data);
-                part.on("end", () => product[part.name] = dataStream);
-            }
+        product.save().then(() => response.redirect(`/?success=${encodeURIComponent("Product was edited successfully!")}`));
+    });
+};
+
+module.exports.getDelete = function(request, response) {
+    productModel.findById(request.params.id).then(function(product) {
+        if (!product) {
+            response.sendStatus(404);
+            return;
+        }
+
+        response.render("product/delete", {
+            product
         });
+    });
+};
 
-        form.on("close", function() {
-            productModel.create(product).then(function(newProduct) {
-                categoryModel.findById(product.category).then(function(category) {
-                    category.products.push(newProduct._id);
-                    category.save();
-                });
+module.exports.postDelete = function(request, response) {
+    productModel.findById(request.params.id).then(function(product) {
+        if (!product) {
+            response.sendStatus(404);
+            return;
+        }
 
-                response.writeHead(302, {
-                    location: "/"
+        product.remove().then(function() {
+            fs.unlink(`./${product.image}`, function(error) {
+                if (error) {
+                    console.log(error);
+                }
+            });
+
+            categoryModel.findById(product.category).then(function(category) {
+                category.products = category.products.filter(categoryProduct => categoryProduct._id.toString() !== product._id.toString());
+                category.save().then(function() {
+                    response.redirect(`/?success=${encodeURIComponent("Product was deleted successfully!")}`)
                 });
-                response.end();
             });
         });
+    });
+};
 
-        form.parse(request);
+module.exports.getBuy = function(request, response) {
+    productModel.findById(request.params.id).then(function(product) {
+        if (!product) {
+            response.sendStatus(404);
+            return;
+        }
 
-        return true;
-    }
-
-    return false;
+        response.render("product/buy", {
+            product
+        });
+    });
 };
